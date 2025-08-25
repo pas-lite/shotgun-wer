@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shotgun VSS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa; /* couleur de fond de secours */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* Pseudo-élément pour le fond flouté */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('logo.jpg') center/1500px no-repeat;
+      filter: blur(8px);
+      transform: scale(1.05); /* évite bords vides après blur */
+      z-index: -1;
+    }
+
+    .wrapper {
+      position: relative;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 60px;
+      height: 80px;
+      border-radius: 60% 60% 60% 60% / 70% 70% 50% 50%;
+      background: var(--balloon-color, #ff6b6b);
+      box-shadow: inset -4px -8px 0 rgba(0,0,0,0.1);
+      animation: float 6s ease-in-out infinite;
+    }
+    .balloon:after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      width: 2px;
+      height: 12px;
+      background: #555;
+      transform: translateX(-50%);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0);} 
+      50% { transform: translateY(-20px);} 
+    }
+
+    /* Spécifique pour quelques ballons */
+    .b1 { top: -40px; left: -40px; --balloon-color:#ff6b6b; animation-duration:5s; }
+    .b2 { top: -50px; right: -40px; --balloon-color:#4dabf7; animation-duration:6.5s; }
+    .b3 { bottom: -50px; left: -30px; --balloon-color:#ffd43b; animation-duration:5.5s; }
+    .b4 { bottom: -60px; right: -30px; --balloon-color:#69db7c; animation-duration:7s; }
+
+    .container {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .radio-group {
+      margin-bottom: 16px;
+    }
+
+    .radio-group input {
+      margin-right: 6px;
+    }
+
+    .radio-group label {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0066ff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    button[disabled] {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    button:not([disabled]):hover {
+      background: #0055d4;
+    }
+
+    .error {
+      color: #d32f2f;
+      margin: -12px 0 16px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="balloon b1"></div>
+    <div class="balloon b2"></div>
+    <div class="balloon b3"></div>
+    <div class="balloon b4"></div>
+    <div class="container">
+    <h1>Shotgun VSS</h1>
+    <form id="shotgun-form">
+      <label for="vss-code">Code VSS unique</label>
+      <input type="text" id="vss-code" name="vss-code" required />
+      <div id="vss-error" class="error">Le code VSS est obligatoire.</div>
+
+      <label for="year">Année</label>
+      <select id="year" name="year" required>
+        <option value="" disabled selected hidden>Choisir l'année</option>
+        <option value="1A">1A</option>
+        <option value="2A">2A</option>
+        <option value="2AD">2AD</option>
+        <option value="3A">3A</option>
+      </select>
+      <div id="year-error" class="error">Veuillez sélectionner votre année.</div>
+
+      <label>Boursier·e ?</label>
+      <div class="radio-group">
+        <input type="radio" id="boursier-oui" name="boursier" value="oui" />
+        <label for="boursier-oui">Oui</label>
+        <input type="radio" id="boursier-non" name="boursier" value="non" />
+        <label for="boursier-non">Non</label>
+      </div>
+      <div id="boursier-error" class="error">Veuillez indiquer si vous êtes boursier·e.</div>
+
+      <label for="email">Adresse mail ENSAE</label>
+      <input type="email" id="email" name="email" placeholder="prenom.nom@ensae.fr" required />
+      <div id="email-error" class="error">Veuillez saisir une adresse ENSAE valide (se terminant par @ensae.fr).</div>
+
+      <button type="submit" id="submit-btn" disabled>Valider et aller sur HelloAsso</button>
+    </form>
+  </div>
+  </div>
+
+  <!-- Suppression des scripts Firebase et remplacement par Endpoint Google Apps Script -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script> -->
+  <script>
+    /* ============================
+       BACKEND GOOGLE SHEETS
+       1. Crée un Google Sheets vide ➜ Extensions > Apps Script.
+       2. Colle le code suivant :
+          function doGet(e){
+            const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('data')||SpreadsheetApp.getActiveSpreadsheet().insertSheet('data');
+            const action = (e.parameter.action||'').toLowerCase();
+            if(action==='count'){
+              const count = sheet.getLastRow();
+              return ContentService.createTextOutput(JSON.stringify({count:count})).setMimeType(ContentService.MimeType.JSON);
+            }
+            return ContentService.createTextOutput('invalid');
+          }
+          function doPost(e){
+            const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('data')||SpreadsheetApp.getActiveSpreadsheet().insertSheet('data');
+            const data = JSON.parse(e.postData.contents);
+            const count = sheet.getLastRow();
+            const MAX = 3; // même limite que côté front
+            if(count>=MAX){
+              return ContentService.createTextOutput(JSON.stringify({success:false,count:count})).setMimeType(ContentService.MimeType.JSON);
+            }
+            sheet.appendRow([new Date(), data.code, data.year, data.boursier, data.email]);
+            return ContentService.createTextOutput(JSON.stringify({success:true,count:count+1})).setMimeType(ContentService.MimeType.JSON);
+          }
+       3. Déploie ➜ "Déployer comme application web" ➜ accès anonyme autorisé, copie l'URL.
+    ============================ */
+  </script>
+  <script>
+    (function () {
+      const form = document.getElementById("shotgun-form");
+      const submitBtn = document.getElementById("submit-btn");
+
+      const vssInput = document.getElementById("vss-code");
+      const yearSelect = document.getElementById("year");
+      const boursierRadios = document.querySelectorAll("input[name='boursier']");
+      const emailInput = document.getElementById("email");
+
+      const errors = {
+        vss: document.getElementById("vss-error"),
+        year: document.getElementById("year-error"),
+        boursier: document.getElementById("boursier-error"),
+        email: document.getElementById("email-error"),
+      };
+
+      const MAX_SLOTS = 160; // Limite globale
+      const ENDPOINT = "https://script.google.com/macros/s/AKfycbxm716EBJKsZV6q0me8tgvxlip3fb1jOOdnmJZkMiXFcSyn0ps9-d_YwH_I3QHBshbN/exec"
+
+      // Vérifie l'état initial
+      fetch(`${ENDPOINT}?action=count`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.count >= MAX_SLOTS) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Complet";
+          }
+        })
+        .catch((err) => console.error(err));
+
+      function validate() {
+        let valid = true;
+        if (!vssInput.value.trim()) {
+          errors.vss.style.display = "block";
+          valid = false;
+        } else errors.vss.style.display = "none";
+
+        if (!yearSelect.value) {
+          errors.year.style.display = "block";
+          valid = false;
+        } else errors.year.style.display = "none";
+
+        const boursierChecked = Array.from(boursierRadios).some((r) => r.checked);
+        if (!boursierChecked) {
+          errors.boursier.style.display = "block";
+          valid = false;
+        } else errors.boursier.style.display = "none";
+
+        const email = emailInput.value.trim();
+        const ensaeRegex = /^[^@\s]+@ensae\.fr$/i;
+        if (!ensaeRegex.test(email)) {
+          errors.email.style.display = "block";
+          valid = false;
+        } else errors.email.style.display = "none";
+
+        submitBtn.disabled = !valid;
+        return valid;
+      }
+
+      [vssInput, yearSelect, emailInput, ...boursierRadios].forEach((el) =>
+        el.addEventListener("input", validate)
+      );
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+
+        submitBtn.disabled = true; // évite double-clic
+        submitBtn.textContent = "Validation…";
+
+        const payload = {
+          code: vssInput.value.trim(),
+          year: yearSelect.value,
+          boursier: document.querySelector("input[name='boursier']:checked").value,
+          email: emailInput.value.trim(),
+        };
+
+        try {
+          const res = await fetch(`${ENDPOINT}?action=increment&${new URLSearchParams(payload)}`);
+          const data = await res.json();
+
+          if (!data.success) {
+            submitBtn.textContent = "Complet";
+            alert("Désolé, il n'y a plus de places disponibles.");
+            return;
+          }
+
+          // Succès : redirection HelloAsso
+          const helloAssoUrl = "https://www.helloasso.com"; // TODO remplacer
+          const params = new URLSearchParams(payload);
+          window.location.href = `${helloAssoUrl}?${params.toString()}`;
+        } catch (err) {
+          console.error(err);
+          alert("Une erreur est survenue. Merci de réessayer.");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Valider et aller sur HelloAsso";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
